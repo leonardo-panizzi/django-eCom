@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from cart.cart import Cart
 from store.models import Product
 from payment.forms import ShippingForm, PaymentForm
-from payment.models import ShippingAddress
+from payment.models import ShippingAddress, Order, OrderItem
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 
 def payment_success(request):
@@ -45,6 +46,9 @@ def billing_info(request):
         cart_products = cart.get_prods()
         quantities = cart.get_quants()
         totals = cart.cart_total()
+
+        my_shipping = request.POST
+        request.session['my_shipping'] = my_shipping
 
         if request.user.is_authenticated:
             return render(request, 'billing_info.html', {
@@ -109,6 +113,58 @@ def payment_info(request):
             })
         else:
             messages.warning(request, "You must be logged in to proceed.")
+            return redirect('home')
+    else:
+        messages.error(request, "You must be logged in to access that page")
+        return redirect('home')
+
+def process_order(request):
+    if request.POST:
+        cart = Cart(request)
+        cart_products = cart.get_prods()
+        quantities = cart.get_quants()
+        totals = cart.cart_total()
+
+        payment_form = PaymentForm(request.POST or None)
+        my_shipping = request.session.get('my_shipping')
+        full_name = my_shipping['shipping_full_name']
+        email = my_shipping['shipping_email']
+        amount_paid = totals
+        shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_country']}\n"
+        if request.user.is_authenticated:
+            user = request.user
+            create_order = Order(user = user, full_name=full_name, email=email, amount_paid=amount_paid, shipping_address=shipping_address)
+            create_order.save()
+            for item in cart_products:
+                product = item['product']  # se è così
+                quantity = item['quantity']
+                price = product.sale_price if product.is_sale else product.price
+
+                OrderItem.objects.create(
+                    order=create_order,
+                    product=product,
+                    user=request.user if request.user.is_authenticated else None,
+                    quantity=quantity,
+                    price=price
+                )
+            messages.success(request, "Order placed successfully")
+            return redirect('home')
+        else:
+            create_order = Order(full_name=full_name, email=email, amount_paid=amount_paid,shipping_address=shipping_address)
+            create_order.save()
+            for item in cart_products:
+                product = item['product']  # se è così
+                quantity = item['quantity']
+                price = product.sale_price if product.is_sale else product.price
+
+                OrderItem.objects.create(
+                    order=create_order,
+                    product=product,
+                    user=request.user if request.user.is_authenticated else None,
+                    quantity=quantity,
+                    price=price
+                )
+            messages.success(request, "Order placed successfully")
             return redirect('home')
     else:
         messages.error(request, "You must be logged in to access that page")

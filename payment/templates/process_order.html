@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Processing the order</h1>
+            <p class="lead fw-normal text-white-50 mb-0">temp</p>
+        </div>
+    </div>
+</header>
+<br/>
+    <div class="container">
+	    <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card text-center">
+                  <div class="card-header">
+                    Order summary
+                  </div>
+                  <div class="card-body">
+                    {% for item in cart_products %}
+                        {{ item.product.name }}:
+                        {% if item.product.is_sale %}
+                            <strike>${{ item.product.price }}</strike>
+                            &nbsp; ${{ item.product.sale_price }}
+                        {% else %}
+                            ${{ item.product.price }}
+                        {% endif %}
+                        <br/>
+                        <small>Quantity: {{ item.quantity }}</small>
+                        <br/><br/>
+                    {% endfor %}
+                    <strong>TOTAL: ${{ totals }}</strong>
+                        <br/><br/>
+                  <a href = "{% url 'cart_summary' %}" class = "btn btn-sm btn-outline-secondary">Edit items</a>
+                  </div>
+                </div>
+            <br/><br/>
+            <div class="card">
+              <div class="card-header">
+                Shipping info
+              </div>
+              <div class="card-body">
+                    <form method="post" action="{% url 'billing_info' %}">
+                        {% csrf_token %}
+                        Name: {{ shipping_info.shipping_full_name }}<br/>
+                        Address: {{ shipping_info.shipping_address1 }}<br/>
+                        City: {{ shipping_info.shipping_city }}<br/>
+                        State: {{ shipping_info.shipping_state }}<br/>
+                        Zip code: {{ shipping_info.shipping_zipcode }}<br/>
+                        <br/>
+                        <a href="{% url 'checkout' %}" class="btn btn-outline-secondary">Update shipping</a>
+                    </form>
+              </div>
+                <br/>
+            </div>
+            <br/><br/>
+            <div class="card">
+              <div class="card-header">
+                Payment info
+              </div>
+              <div class="card-body">
+                  <form method="POST" action="{% url 'process_order' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="card_name" class="form-label">Cardholder Name</label>
+                        <input type="text" class="form-control" id="card_name" name="card_name" required placeholder="Name Surname">
+                        <label for="card_number" class="form-label">Card Number</label>
+                        <input type="text" class="form-control" id="card_number" name="card_number" required placeholder="XXXX-XXXX-XXXX-XXXX">
+                        <label for="card_expiry" class="form-label"> Expiry Date</label>
+                        <input type="text" class="form-control" id="card_expiry" name="card_expiry" placeholder="MM/YY" required>
+                        <label for="card_cvc" class="form-label">CVV</label>
+                        <input type="text" class="form-control" id="card_cvc" name="card_cvc" required placeholder="123">
+                        <label for="card_address1" class="form-label">Owner Address</label>
+                        <input type="text" class="form-control" id="card_address1" name="card_address1" required placeholder="1234 Main St">
+                        <label for="card_address2" class="form-label">Address 2</label>
+                        <input type="text" class="form-control" id="card_address2" name="card_address2" placeholder="Apartment, studio, or floor">
+                        <label for="card_city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="card_city" name="card_city" required placeholder="City">
+                        <label for="card_state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="card_state" name="card_state" required placeholder="State">
+                        <label for="card_zipcode" class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" id="card_zipcode" name="card_zipcode" required placeholder="12345">
+                        <label for="card_country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="card_country" name="card_country" required placeholder="Country">
+                    </div>
+
+                      <button type="submit" class = "btn btn-success">Pay now</button>
+                  </form>
+              </div>
+                <br/><br/>
+            </div>
+                <br/>
+            </div>
+        </div>
+        <br/>
+    </div>
+
+
+{% endblock %}

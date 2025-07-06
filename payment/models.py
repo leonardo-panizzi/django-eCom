@@ -30,7 +30,7 @@ post_save.connect(create_shipping, sender=User)
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     full_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
+    email = models.CharField(max_length=100, default='example@example.com')
     shipping_address = models.TextField(max_length=15000)
     amount_paid = models.DecimalField(decimal_places=2, max_digits=10)
     date_ordered = models.DateTimeField(auto_now_add=True)
