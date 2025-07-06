@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from cart.cart import Cart
 from store.models import Product
-from payment.forms import ShippingForm
+from payment.forms import ShippingForm, PaymentForm
 from payment.models import ShippingAddress
 from django.contrib import messages
 
@@ -19,18 +19,19 @@ def checkout(request):
 
     try:
         shipping_instance = ShippingAddress.objects.get(user=request.user)
+        billing_form = PaymentForm()
     except ShippingAddress.DoesNotExist:
         shipping_instance = None
 
-        # Inizializza il form
     if request.method == 'GET':
         if shipping_instance:
             form = ShippingForm(instance=shipping_instance)
+            billing_form = PaymentForm()
         else:
             form = ShippingForm()
     else:
         form = ShippingForm(request.POST, instance=shipping_instance)
-
+        billing_form = PaymentForm()
     return render(request, 'payment/checkout.html', {
         'cart_products': products,
         'quantities': quantities,
@@ -51,6 +52,60 @@ def billing_info(request):
                 "totals": totals,
                 "quantities": quantities,
                 "shipping_info": request.POST.dict()
+            })
+        else:
+            messages.warning(request, "You must be logged in to proceed.")
+            return redirect('home')
+    else:
+        messages.error(request, "You must be logged in to access that page")
+        return redirect('home')
+
+# def billing_info(request):
+#     if not request.user.is_authenticated:
+#         messages.warning(request, "You must be logged in to access billing info.")
+#         return redirect('login')
+#
+#     cart = Cart(request)
+#     cart_products = cart.get_prods()
+#     quantities = cart.get_quants()
+#     totals = cart.cart_total()
+#
+#     # Puoi anche recuperare i dati di spedizione se vuoi
+#     try:
+#         shipping_info = ShippingAddress.objects.get(user=request.user)
+#     except ShippingAddress.DoesNotExist:
+#         shipping_info = None
+#
+#     if request.method == "POST":
+#         billing_form = PaymentForm(request.POST)
+#         if billing_form.is_valid():
+#             # Qui puoi salvare o processare i dati di pagamento
+#             messages.success(request, "Payment info received.")
+#             return redirect('success_page')  # O la tua pagina di conferma
+#     else:
+#         billing_form = PaymentForm()
+#
+#     return render(request, 'billing_info.html', {
+#         "cart_products": cart_products,
+#         "quantities": quantities,
+#         "totals": totals,
+#         "shipping_info": shipping_info,
+#         "billing_form": billing_form,
+#     })
+
+def payment_info(request):
+    if request.POST:
+        cart = Cart(request)
+        cart_products = cart.get_prods()
+        quantities = cart.get_quants()
+        totals = cart.cart_total()
+
+        if request.user.is_authenticated:
+            return render(request, 'payment_info.html', {
+                "cart_products": cart_products,
+                "totals": totals,
+                "quantities": quantities,
+                "billing_info": request.POST.dict()
             })
         else:
             messages.warning(request, "You must be logged in to proceed.")
