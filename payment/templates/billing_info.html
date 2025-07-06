@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Billing info</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Enter your payment info</p>
+        </div>
+    </div>
+</header>
+<br/>
+    <div class="container">
+	    <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card text-center">
+                  <div class="card-header">
+                    Order summary
+                  </div>
+                  <div class="card-body">
+                    {% for item in cart_products %}
+                        {{ item.product.name }}:
+                        {% if item.product.is_sale %}
+                            <strike>${{ item.product.price }}</strike>
+                            &nbsp; ${{ item.product.sale_price }}
+                        {% else %}
+                            ${{ item.product.price }}
+                        {% endif %}
+                        <br/>
+                        <small>Quantity: {{ item.quantity }}</small>
+                        <br/><br/>
+                    {% endfor %}
+                    <strong>TOTAL: ${{ totals }}</strong>
+                        <br/><br/>
+                  <a href = "{% url 'cart_summary' %}" class = "btn btn-sm btn-outline-secondary">Edit items</a>
+                  </div>
+                </div>
+            <br/><br/>
+            <div class="card">
+              <div class="card-header">
+                Shipping info
+              </div>
+              <div class="card-body">
+                    <form method="post" action="{% url 'billing_info' %}">
+                        {% csrf_token %}
+                        Name: {{ shipping_info.shipping_full_name }}<br/>
+                        Address: {{ shipping_info.shipping_address }}<br/>
+                        City: {{ shipping_info.shipping_city }}<br/>
+                        State: {{ shipping_info.shipping_state }}<br/>
+                        Zip code: {{ shipping_info.shipping_zip_code }}<br/>
+                        Phone: {{ shipping_info.shipping_phone }}<br/>
+
+                    </form>
+              </div>
+            </div>
+            <br/>
+                <a href = "#" class = "btn btn-success">Pay now</a>
+            </div>
+        </div>
+        <br/>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+<br/>
+<div class = "card mb-3">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+      	<center>
+        <h5 class="card-title">{{ product.name }}</h5>
+        <p class="card-text">{{ product.description }}</p>
+        <div class="d-flex justify-content-center small text-warning mb-2">
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-half"></div>
+        </div>
+        
+        {% if product.is_sale %}
+        <div class="d-flex justify-content-center small text-danger mb-2"><div class="bi-cash-coin"></div> &nbsp;&nbsp;Sale&nbsp;&nbsp;<div class="bi-cash-coin"></div>
+    	</div>
+        <strike>${{ product.price }}</strike>
+        &nbsp;
+        ${{ product.sale_price }}
+            <br/>Left in stock: <span id="stock-qty"></span>
+        {% else %}
+        	${{ product.price }}
+          <br/>Left in stock: <span id="stock-qty"></span>
+        {% endif %}
+		    <br/><br/>
+            <div class="row justify-content-center">
+                <div class="col-md-2">Item quantity:</div>
+                <div class="col-md-2">
+                <select class="form-select form-select-sm" id="qty-cart">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+                </div>
+            </div>
+            <br/><br/>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Home</a>
+        <button type="button" class="btn btn-secondary" id="add-cart" data-id="{{ product.id }}">Add to cart</button>
+    </center>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<script>
+$(document).on('click', '#add-cart', function(e){
+  e.preventDefault();
+  const productId = $(this).data('id');
+  const quantity = $('#qty-cart').val();
+
+  $.ajax({
+    type: 'POST',
+    url: '{% url "cart_add" %}',
+    data: {
+      product_id: productId,
+      quantity: quantity,
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      action: 'post'
+    },
+    success: function(json){
+      document.getElementById("cart_quantity").textContent = json.qty;
+    },
+    error: function(xhr, errmsg, err){
+      console.error('Ajax err:', errmsg);
+    }
+  });
+});
+</script>
+
+<script>
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var stockQty = getRandomInt(8, 64);
+    var stockElem = document.getElementById('stock-qty');
+
+    stockElem.textContent = stockQty;
+
+    // color changes based on stock quantity
+    if (stockQty < 13) {
+      stockElem.style.color = 'red';
+    } else if (stockQty >= 13 && stockQty <= 25) {
+      stockElem.style.color = 'goldenrod';
+    } else {
+      stockElem.style.color = 'green';
+    }
+  });
+</script>
+
+{% endblock %}
