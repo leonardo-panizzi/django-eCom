@@ -104,4 +104,18 @@ $(document).on('click', '#add-cart', function(e){
   });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("add-cart");
+    if (btn) {
+        btn.addEventListener("click", function () {
+            alert("Item(s) successfully added to your cart");
+            location.reload();
+        });
+    }
+});
+</script>
+
+
+
 {% endblock %}
