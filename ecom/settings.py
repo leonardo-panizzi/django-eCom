@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-b6m*$13z9h7y7&9v1hz6n0evqq)*i1v%eih7x!(1ox=xi!7v@b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django-ecom-production-ef3e.up.railway.app']
 
 
 # Application definition
