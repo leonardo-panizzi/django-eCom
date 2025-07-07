@@ -29,7 +29,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['django-ecom-production-ef3e.up.railway.app', 'localhost', '127.0.0.1']
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ['https://django-ecom-production-ef3e.up.railway.app/']
+CSRF_TRUSTED_ORIGINS = ['https://django-ecom-production-ef3e.up.railway.app']
 
 # Application definition
 
