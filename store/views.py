@@ -8,9 +8,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .forms import SignUpForm, UpdateUserForm, ChangePasswordForm, UserInfoForm
 from django import forms
+from django.views.generic import ListView
 from django.db.models import Q
 import json
 from cart.cart import Cart
+
+class ProductListView(ListView):
+    model = Product
+    template_name = 'home.html'
+    context_object_name = 'products'
 
 def update_info(request):
     if request.user.is_authenticated:
