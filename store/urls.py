@@ -3,7 +3,6 @@ from . import views
 from store.views import ProductListView
 
 urlpatterns = [
-    #path('', views.home, name='home'),
     path('', ProductListView.as_view(), name='home'),
     path('about/', views.about, name='about'),
     path('login/', views.login_user, name='login'),

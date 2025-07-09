@@ -10,25 +10,13 @@ def cart_summary(request):
     product_ids = cart.cart.keys()
     products = Product.objects.filter(id__in=product_ids)
     quantities = {str(p.id): cart.cart[str(p.id)]['quantity'] for p in products}
-    # for product_id, item in cart.cart.items():
-    #     product = get_object_or_404(Product, id=product_id)
-    #     product.quantity = item.get('quantity', 1)
-    #     product.subtotal = float(item.get('price')) * product.quantity
-    #     cart_products.append(product)
-    #
-    # totals = sum(p.subtotal for p in cart_products)
-    #
-    # context = {
-    #     'cart_products': cart_products,
-    #     'totals': totals,
-    # }
+
     context = {
         'cart_products': products,
         'totals': cart.cart_total(),
         'quantities': quantities,
     }
     return render(request, 'cart_summary.html', context)
-
 
 
 def cart_add(request):

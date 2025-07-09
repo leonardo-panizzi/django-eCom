@@ -64,39 +64,6 @@ def billing_info(request):
         messages.error(request, "You must be logged in to access that page")
         return redirect('home')
 
-# def billing_info(request):
-#     if not request.user.is_authenticated:
-#         messages.warning(request, "You must be logged in to access billing info.")
-#         return redirect('login')
-#
-#     cart = Cart(request)
-#     cart_products = cart.get_prods()
-#     quantities = cart.get_quants()
-#     totals = cart.cart_total()
-#
-#     # Puoi anche recuperare i dati di spedizione se vuoi
-#     try:
-#         shipping_info = ShippingAddress.objects.get(user=request.user)
-#     except ShippingAddress.DoesNotExist:
-#         shipping_info = None
-#
-#     if request.method == "POST":
-#         billing_form = PaymentForm(request.POST)
-#         if billing_form.is_valid():
-#             # Qui puoi salvare o processare i dati di pagamento
-#             messages.success(request, "Payment info received.")
-#             return redirect('success_page')  # O la tua pagina di conferma
-#     else:
-#         billing_form = PaymentForm()
-#
-#     return render(request, 'billing_info.html', {
-#         "cart_products": cart_products,
-#         "quantities": quantities,
-#         "totals": totals,
-#         "shipping_info": shipping_info,
-#         "billing_form": billing_form,
-#     })
-
 def payment_info(request):
     if request.POST:
         cart = Cart(request)
@@ -131,12 +98,14 @@ def process_order(request):
         email = my_shipping['shipping_email']
         amount_paid = totals
         shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_country']}\n"
+
         if request.user.is_authenticated:
             user = request.user
             create_order = Order(user = user, full_name=full_name, email=email, amount_paid=amount_paid, shipping_address=shipping_address)
             create_order.save()
+
             for item in cart_products:
-                product = item['product']  # se è così
+                product = item['product']
                 quantity = item['quantity']
                 price = product.sale_price if product.is_sale else product.price
 
@@ -147,6 +116,7 @@ def process_order(request):
                     quantity=quantity,
                     price=price
                 )
+
             messages.success(request, "Order placed successfully")
             return redirect('home')
         else:
