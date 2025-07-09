@@ -1,3 +1,4 @@
+https://django-ecom-production-ef3e.up.railway.app/
 This is a django ecommerce platform featuring:
 - a home page displaying the shop's products
 - a search page to find specific products by their name or description
