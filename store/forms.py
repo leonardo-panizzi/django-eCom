@@ -71,20 +71,15 @@ class UpdateUserForm(UserChangeForm):
 	email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'}), required=False)
 	first_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'}), required=False)
 	last_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'}), required=False)
+	password = forms.Field(label="", widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}), required=False, help_text='Leave blank if you do not want to change your password.')
+
 
 	class Meta:
 		model = User
-		fields = ['username', 'first_name', 'last_name', 'email']
-		# widgets = {
-		# 	'username': forms.TextInput(attrs={'placeholder': 'Enter your username'}),
-		# 	'first_name': forms.TextInput(attrs={'placeholder': 'First name'}),
-		# 	'last_name': forms.TextInput(attrs={'placeholder': 'Last name'}),
-		# 	'email': forms.EmailInput(attrs={'placeholder': 'email'}),
-		# }
+		fields = ['username', 'first_name', 'last_name', 'email', 'password']
 
 	def __init__(self, *args, **kwargs):
 		super(UpdateUserForm, self).__init__(*args, **kwargs)
 		for field in self.fields.values():
 			field.widget.attrs['class'] = 'form-control'
 			field.label = ''
-

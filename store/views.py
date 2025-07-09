@@ -12,6 +12,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 import json
 from cart.cart import Cart
+from django.contrib.auth.hashers import make_password
 
 class ProductListView(ListView):
     model = Product
@@ -76,14 +77,24 @@ def update_user(request):
      if request.user.is_authenticated:
          current_user = User.objects.get(id=request.user.id)
          user_form = UpdateUserForm(request.POST or None, instance=current_user)
+         provided_passwd = request.POST.get('password')
 
          if user_form.is_valid():
-             user_form.save()
+             user_form.save(commit=True)
+
+             if provided_passwd:
+                 current_user.set_password(provided_passwd)
+                 current_user.save()
+                 messages.success(request, "Password has been updated, please log in again")
+                 logout(request)
+                 return redirect('login')
 
              login(request, current_user)
              messages.success(request, "User has been updated")
+
              return redirect('home')
          return render(request, "update_user.html", {'user_form': user_form})
+
      else:
          messages.success(request, "You must be logged in to access that page")
          return redirect('home')
